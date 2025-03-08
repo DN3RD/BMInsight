@@ -33,7 +33,7 @@ pub fn App() -> Element {
     };
 
     rsx! {
-        link { rel: "stylesheet", href: "styles.css" }
+        link { rel: "stylesheet", href: "assets/styles.css" }
         main {
             class: "container",
             h1 { "Welcome to Tauri + Dioxus" }
@@ -44,7 +44,7 @@ pub fn App() -> Element {
                     href: "https://tauri.app",
                     target: "_blank",
                     img {
-                        src: "/tauri.svg",
+                        src: "assets/tauri.svg",
                         class: "logo tauri",
                          alt: "Tauri logo"
                     }
@@ -53,7 +53,7 @@ pub fn App() -> Element {
                     href: "https://dioxuslabs.com/",
                     target: "_blank",
                     img {
-                        src: "/dioxus.png",
+                        src: "assets/dioxus.png",
                         class: "logo dioxus",
                         alt: "Dioxus logo"
                     }
