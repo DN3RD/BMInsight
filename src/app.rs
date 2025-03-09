@@ -19,7 +19,7 @@ struct BmiArgs {
     weightPounds: u16,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 struct BmiResult {
     bmi_value: f64,
     category: String,
@@ -37,8 +37,8 @@ pub fn App() -> Element {
     let ageSignal = use_signal(|| "1".to_string());
     let genderSignal = use_signal(move || "male".to_string());
     let heightSignal = use_signal(|| 48u16);
-    let mut name = use_signal(|| String::new());
-    let mut greet_msg = use_signal(|| String::new());
+
+    let mut hiddenSignal = use_signal(move || true);
 
     let mut bmi_result = use_signal(|| {
         BmiResult {
@@ -49,85 +49,83 @@ pub fn App() -> Element {
     });
 
 
-    let greet = move |_: FormEvent| async move {
-        if name.read().is_empty() {
-            return;
-        }
-
-        let name = name.read();
-        let args = serde_wasm_bindgen::to_value(&GreetArgs { name: &*name }).unwrap();
+    let getBmi = move |_: MouseEvent| async move {
         let bmi_args = serde_wasm_bindgen::to_value(&BmiArgs {
-            age: 22,
-            gender: "male".to_string(),
-            heightInches: 70,
-            weightPounds: 180,
+            age: ageSignal().parse().unwrap(),
+            gender: genderSignal(),
+            heightInches: heightSignal(),
+            weightPounds: weightSignal().parse().unwrap(),
         }).unwrap();
 
         let bmi = invoke("compute_bmi", bmi_args).await;
-
-        // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-        let new_msg = invoke("greet", args).await.as_string().unwrap();
-        greet_msg.set(new_msg);
         bmi_result.set(serde_wasm_bindgen::from_value(bmi).unwrap());
+        hiddenSignal.set(false)
     };
-
+    let bmi = bmi_result().clone();
     rsx! {
         link { rel: "stylesheet", href: "assets/styles.css" }
         link { rel: "stylesheet", href:"https://fonts.googleapis.com/icon?family=Material+Icons" }
         main {
             class: "main",
             div {
-                class: "column container",
-                h2 {
-                    class: "title",
-                    "BMI Insight"
-                }
-                Gender {
-                    gender: genderSignal
-                }
-                Ruler {
-                    height: heightSignal,
-                }
-                Scale {
-                    max: 1000,
-                    min: 1,
-                    title: "Weight (in Lb)",
-                    scaleValue: weightSignal,
+                class: "container",
+                div {
+                    class: "column form-container",
+                    h2 {
+                        class: "title",
+                        "BMI Insight"
+                    }
+                    Gender {
+                        gender: genderSignal
+                    }
+                    Ruler {
+                        height: heightSignal,
+                    }
+                    Scale {
+                        max: 1000,
+                        min: 1,
+                        title: "Weight (in Lb)",
+                        scaleValue: weightSignal,
 
-                }
-                Scale {
-                    max: 100,
-                    min: 1,
-                    title: "Age",
-                    scaleValue: ageSignal,
+                    }
+                    Scale {
+                        max: 100,
+                        min: 1,
+                        title: "Age",
+                        scaleValue: ageSignal,
+                    }
                 }
             }
             div {
-                class: "result-container-wrapper",
+                class: format!("result-container-wrapper {}", if hiddenSignal() {""} else {"full-page"}),
+                onclick: move |_| {
+                    hiddenSignal.set(true);
+                },
                 div {
                     class: "result-container",
                     div {
                         class: "circle",
+                        onclick: getBmi,
                         "BMI"
                     }
                     div {
-                        class: "result-wrapper hidden",
+                        class: format!("result-wrapper {}", if hiddenSignal() {"hidden"} else {""}),
                         p {
                             class: "result-header",
                             "Your BMI is"
                         }
                         p {
                             class: "result-value",
-                            "19.6 Kg/m"
+                            "{bmi.bmi_value} Kg/m"
                             sup { "2" }
                         }
                         p {
                             class: "result-category",
-                            "(Normal)"
+                            "{bmi_result().category}"
                         }
                         p {
                             class: "result-recommendation",
-                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum. Sed sollicitudin erat eu augue interdum, in convallis libero feugiat. Morbi ac nulla sed felis iaculis luctus et at purus. Ut ut bibendum elit. Mauris iaculis, mauris et auctor consequat, nisl erat cursus metus, at iaculis felis lectus a erat. Proin ut libero et enim efficitur auctor. Sed et lacinia orci. Curabitur a odio mi."
+                            "{bmi_result().feedback}"
                         }
                     }
                 }

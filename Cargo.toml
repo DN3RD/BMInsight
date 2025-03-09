@@ -8,7 +8,10 @@ edition = "2021"
 dioxus = { version = "0.6", features = ["web"] }
 dioxus-logger = "0.6"
 wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
 web-sys = { version = "0.3", features = ["ScrollToOptions"] }
+serde = { version = "1.0.218", features = ["derive"] }
+serde-wasm-bindgen = "0.6"
 
 [workspace]
 members = ["src-tauri"]
