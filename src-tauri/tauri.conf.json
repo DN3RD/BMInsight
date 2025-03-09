@@ -14,8 +14,9 @@
     "windows": [
       {
         "title": "bminsight",
-        "width": 800,
-        "height": 600
+        "width": 430,
+        "height": 932,
+        "resizable": false
       }
     ],
     "security": {
