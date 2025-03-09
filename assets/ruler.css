@@ -1,0 +1,79 @@
+.ruler-wrapper {
+  color: #333;
+  overflow: hidden;
+  padding: 24px;
+  border-radius: 18px;
+  border: 1px solid #999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ruler-wrapper>h4{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ruler {
+  color: #333;
+  overflow-x: scroll;
+  scroll-behavior: smooth;
+  width: 100%;
+  height: 80px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.ruler-container:first-child {
+  padding-left: calc(50% - 16px);
+}
+.ruler-container:last-child {
+  padding-right: calc(50% - 16px);
+}
+.ruler::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+.major-tick {
+  width: 2px;
+  height: 30px;
+  background-color: #333;
+  opacity: 0.4;
+  transition: height 0.3s ease, width 0.3s ease, background-color 0.3s ease, opacity 0.3s ease;
+}
+.minor-tick {
+  width: 1px;
+  height: 15px;
+  background-color: #333;
+  opacity: 0.4;
+  transition: height 0.3s ease, width 0.3s ease, background-color 0.3s ease, opacity 0.3s ease;
+}
+.major-unit {
+  font-size: 12pt;
+  opacity: 0.4;
+  transition: font-size 0.3s ease, opacity 0.3s ease;
+}
+.minor-unit {
+  font-size: 10pt;
+  opacity: 0.4;
+  transition: font-size 0.3s ease, opacity 0.3s ease;
+}
+
+.tick-container {
+  width: 32px;
+  gap: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  transition: font-size 0.3s ease, font-weight 0.3s ease, color 0.3s ease; /* Animate text changes */
+}
+.tick-container.highlight > .major-unit, .tick-container.highlight > .minor-unit {
+  font-size: 18px;
+  font-weight: 700;
+  color: dodgerblue;
+  opacity: 1;
+}
+.tick-container.highlight > .major-tick, .tick-container.highlight > .minor-tick {
+  width: 3px;
+  height: 45px;
+  background-color: dodgerblue;
+  opacity: 1;
+}
