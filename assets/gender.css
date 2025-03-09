@@ -1,0 +1,32 @@
+
+.gender-wrapper {
+  gap: 24px;
+}
+.gender {
+  width: 50%;
+  border: 2px solid #999;
+  border-radius: 18px;
+  padding: 24px;
+  text-align: center;
+  font-size: 16px;
+  gap: 12px;
+  font-weight: 600;
+}
+.gender.highlight-male{
+  border: 2px solid dodgerblue;
+  box-shadow: 0 0 24px rgba(30, 144, 255, 0.3);
+}
+.gender.highlight-female{
+  border: 2px solid hotpink;
+  box-shadow: 0 0 24px rgba(255, 105, 180, 0.3);
+}
+.gender-icon {
+  font-size: 100px !important;
+  font-weight: 400 !important;
+}
+.male {
+  color: dodgerblue;
+}
+.female {
+  color: hotpink;
+}
