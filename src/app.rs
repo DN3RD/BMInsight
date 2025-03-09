@@ -2,7 +2,8 @@
 
 use dioxus::prelude::*;
 use dioxus::web::WebEventExt;
-use web_sys::{console, HtmlElement, ScrollIntoViewOptions, ScrollToOptions};
+use wasm_bindgen::JsCast;
+use web_sys::{window, console, HtmlElement, ScrollIntoViewOptions, ScrollToOptions};
 use wasm_bindgen::prelude::*;
 
 fn format_height(height: u16) -> String {
@@ -22,10 +23,7 @@ pub fn App() -> Element {
         let data = event.data();
         if let Some(target) = event.data.as_web_event().target().and_then(|target| target.dyn_into::<HtmlElement>().ok()){
             let scroll_index = target.scroll_left() as f64;
-            let options = ScrollToOptions::new();
-            let index: f64 = ((scroll_index - 12f64)/24f64).ceil();
-            options.set_behavior(web_sys::ScrollBehavior::Smooth);
-            options.set_left(index *24f64);
+            let index: f64 = ((scroll_index - 6f64)/32f64).ceil();
             console::log_1(&format!("Scroll event scrollIndex: {:?}", scroll_index).into());
             scroll_position.set(index);
         }
@@ -40,7 +38,7 @@ pub fn App() -> Element {
                 div {
                     class: "row ruler-container",
                     onscroll: onscroll,
-                    for (index,height) in (60..=96).enumerate() {
+                    for (index,height) in (48..=96).enumerate() {
                         div {
                             class: if (index as f64 == scroll_position()) {"tick-container highlight"} else {"tick-container"},
                             span {
