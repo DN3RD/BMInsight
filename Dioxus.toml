@@ -11,8 +11,7 @@ title = "Tauri + Dioxus App"
 reload_html = true
 watch_path = ["src", "assets"]
 
-[web.resource]
-dev = { command = "dx", args = ["serve", "--port", "1420"] }
-style = [
-    "./assets/style.css",
-]
+#[web.resource]
+#style = [
+#    "./assets/style.css",
+#]
