@@ -1,54 +1,42 @@
 #![allow(non_snake_case)]
 
 use dioxus::prelude::*;
-use dioxus::web::WebEventExt;
-use wasm_bindgen::JsCast;
-use web_sys::{window, console, HtmlElement, ScrollIntoViewOptions, ScrollToOptions};
 use wasm_bindgen::prelude::*;
+use crate::components::{Gender, Ruler, Scale};
 
-fn format_height(height: u16) -> String {
-    let feet = height / 12;
-    let inches = height % 12;
-
-    if inches == 0 {
-        format!("{}'", feet)
-    } else {
-        format!("{}'{}\"", feet, inches)
-    }
-}
 
 pub fn App() -> Element {
-    let mut scroll_position = use_signal(|| 0f64);
-    let onscroll = move |event: Event<ScrollData>| {
-        let data = event.data();
-        if let Some(target) = event.data.as_web_event().target().and_then(|target| target.dyn_into::<HtmlElement>().ok()){
-            let scroll_index = target.scroll_left() as f64;
-            let index: f64 = ((scroll_index - 6f64)/32f64).ceil();
-            console::log_1(&format!("Scroll event scrollIndex: {:?}", scroll_index).into());
-            scroll_position.set(index);
-        }
-    };
+    let weightSignal = use_signal(|| "1".to_string());
+    let ageSignal = use_signal(|| "1".to_string());
+    let genderSignal = use_signal(move || "male".to_string());
+    let heightSignal = use_signal(|| 48u16);
     rsx! {
         link { rel: "stylesheet", href: "assets/styles.css" }
+        link { rel: "stylesheet", href:"https://fonts.googleapis.com/icon?family=Material+Icons" }
         main {
-            class: "row container",
-            div {
-                class: "row ruler",
-                onscroll: onscroll,
-                div {
-                    class: "row ruler-container",
-                    onscroll: onscroll,
-                    for (index,height) in (48..=96).enumerate() {
-                        div {
-                            class: if (index as f64 == scroll_position()) {"tick-container highlight"} else {"tick-container"},
-                            span {
-                                class: if height % 12 == 0 { "major-unit" } else { "minor-unit" },
-                                "{format_height(height)}"
-                            } // Interpolate the height in the p element
-                            div { class: if height % 12 == 0 { "major-tick" } else { "minor-tick" } }
-                        }
-                    }
-                }
+            class: "column container",
+            h2 {
+                class: "title",
+                "BMI Insight"
+            }
+            Gender {
+                gender: genderSignal
+            }
+            Ruler {
+                height: heightSignal,
+            }
+            Scale {
+                max: 1000,
+                min: 1,
+                title: "Weight (in Lb)",
+                scaleValue: weightSignal,
+
+            }
+            Scale {
+                max: 100,
+                min: 1,
+                title: "Age",
+                scaleValue: ageSignal,
             }
         }
     }
