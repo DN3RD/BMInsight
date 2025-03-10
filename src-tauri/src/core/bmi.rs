@@ -44,11 +44,12 @@ const PROMPT_CONTEXT: &str = r#"You are a health professional providing feedback
 - Gender
 - BMI value
 - BMI category
-Each patient prompt will include these params, your response must be structured as a JSON object with the following fields:
- - interpretation : a string that will explain the patient's BMI category, it should be one sentence long.
- - suggestions : a string array that will provide the patient with some suggestions on how to improve their health based on the bmi results and a patients age and gender,
-     each array elements would be a bullet point. Max array elements is 5 and min is 3.
-Your response should be deterministic with respect to the input parameters."#;
+Each patient prompt will include these params, your response must be structured as 2 paragraphs :
+ - a sentence that will explain the patient's BMI category.
+ - a paragraph that will provide the patient with some suggestions on how to improve their health based on the bmi results and a patients age and gender,
+     each elements would be a short sentence. Max elements is 5 and min is 3.
+Your response should be deterministic with respect to the input parameters.
+Your response should be directed to the user."#;
 
 #[derive(Debug)]
 pub struct BmiInput {
