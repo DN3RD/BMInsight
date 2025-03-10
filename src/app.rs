@@ -1,9 +1,9 @@
 #![allow(non_snake_case)]
 
+use crate::components::{Gender, Ruler, Scale};
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
-use crate::components::{Gender, Ruler, Scale};
 
 #[wasm_bindgen]
 extern "C" {
@@ -15,20 +15,32 @@ extern "C" {
 struct BmiArgs {
     age: u8,
     gender: String,
-    heightInches: u16,
-    weightPounds: u16,
+    #[serde(rename = "heightInches")]
+    height_inches: u16,
+    #[serde(rename = "weightPounds")]
+    weight_pounds: u16,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct BmiFeedback {
+    pub interpretation: String,
+    pub suggestions: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 struct BmiResult {
     bmi_value: f64,
     category: String,
-    feedback: String
+    feedback: BmiFeedback,
 }
 
 impl std::fmt::Display for BmiResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "BMI: {:.1}, Category: {}, Feedback: {}", self.bmi_value, self.category, self.feedback)
+        write!(
+            f,
+            "BMI: {:.1}, Category: {}, Feedback: {:?}",
+            self.bmi_value, self.category, self.feedback
+        )
     }
 }
 
@@ -40,22 +52,23 @@ pub fn App() -> Element {
 
     let mut hiddenSignal = use_signal(move || true);
 
-    let mut bmi_result = use_signal(|| {
-        BmiResult {
-            bmi_value: 0.0,
-            category: String::new(),
-            feedback: String::new(),
-        }
+    let mut bmi_result = use_signal(|| BmiResult {
+        bmi_value: 0.0,
+        category: String::new(),
+        feedback: BmiFeedback {
+            interpretation: String::new(),
+            suggestions: vec![],
+        },
     });
-
 
     let getBmi = move |_: MouseEvent| async move {
         let bmi_args = serde_wasm_bindgen::to_value(&BmiArgs {
             age: ageSignal().parse().unwrap(),
             gender: genderSignal(),
-            heightInches: heightSignal(),
-            weightPounds: weightSignal().parse().unwrap(),
-        }).unwrap();
+            height_inches: heightSignal(),
+            weight_pounds: weightSignal().parse().unwrap(),
+        })
+        .unwrap();
 
         let bmi = invoke("compute_bmi", bmi_args).await;
         bmi_result.set(serde_wasm_bindgen::from_value(bmi).unwrap());
@@ -123,10 +136,19 @@ pub fn App() -> Element {
                             class: "result-category",
                             "{bmi_result().category}"
                         }
+
                         p {
-                            class: "result-recommendation",
-                            "{bmi_result().feedback}"
+                             class: "interpretation-text",
+                            "{bmi_result().feedback.interpretation}"
                         }
+                        
+                        ul {
+                            style: "list-style-type: disc; text-align: left; margin-left: 1em;",
+                            for suggestion in &bmi_result().feedback.suggestions {
+                                li { "{suggestion}" }
+                            }
+                        }
+
                     }
                 }
             }
