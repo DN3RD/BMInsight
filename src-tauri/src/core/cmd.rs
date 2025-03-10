@@ -4,12 +4,6 @@ use tauri::{State, command};
 use crate::core::state::AppState;
 use crate::core::bmi::{calculate_bmi, categorize_bmi, get_feedback, BmiCategory, BmiFeedback, BmiInput};
 
-#[command]
-pub fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
-
 #[derive(Serialize)]
 pub struct BmiResult {
     pub bmi_value: f64,
