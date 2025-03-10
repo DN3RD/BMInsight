@@ -1,10 +1,9 @@
 #![allow(non_snake_case)]
 
-use dioxus::html::geometry::euclid::num::Ceil;
 use dioxus::prelude::*;
 use dioxus::web::WebEventExt;
-use wasm_bindgen::{JsCast, JsValue};
-use web_sys::{console, window, HtmlElement, ScrollToOptions};
+use wasm_bindgen::{JsCast};
+use web_sys::{HtmlElement};
 
 fn format_height(height: u16) -> String {
     let feet = height / 12;
@@ -25,7 +24,7 @@ pub fn Ruler(height: Signal<u16>) -> Element {
             let target_scroll = target.scroll_left() as f64;
             let scroll_index = ( target_scroll - 16f64)/32f64;
             let index =  scroll_index.ceil();
-            if(target_scroll <= index*32f64 + 16f64 && target_scroll >= index*32f64 - 16f64 ) {
+            if target_scroll <= index*32f64 + 16f64 && target_scroll >= index*32f64 - 16f64 {
                 scroll_position.set(index);
             } else {
                 scroll_position.set(scroll_index);

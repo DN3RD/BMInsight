@@ -1,6 +1,5 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
-use web_sys::{console};
 #[component]
 pub fn Scale(max: u32, min: u32, title: String, scaleValue: Signal<String>) -> Element {
     rsx!{
