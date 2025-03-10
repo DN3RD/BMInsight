@@ -139,3 +139,8 @@ body{
   height: 100vh;
   overflow: hidden;
 }
+.list {
+  list-style-type: "- ";
+  text-align: left;
+  margin: 0 1em;
+}

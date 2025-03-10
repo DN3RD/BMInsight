@@ -143,9 +143,12 @@ pub fn App() -> Element {
                         }
                         
                         ul {
-                            style: "list-style-type: disc; text-align: left; margin-left: 1em;",
+                            class: "list",
                             for suggestion in &bmi_result().feedback.suggestions {
-                                li { "{suggestion}" }
+                                li {
+                                    class: "list-item",
+                                    "{suggestion}"
+                                }
                             }
                         }
 
