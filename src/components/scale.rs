@@ -41,7 +41,19 @@ pub fn Scale(max: u32, min: u32, title: String, scaleValue: Signal<String>) -> E
                             }
                         } else {
                             scaleValue.set(String::from(""));
-                        }}
+                        }
+                    },
+                    onkeydown: move |evt| {
+                        // console::log_1(evt.into());
+                        match &evt.key() {
+                            Key::Character(c) if c.chars().all(|ch| ch.is_numeric()) => {},
+                            Key::Backspace | Key::Delete | Key::ArrowLeft | Key::ArrowRight | Key::Tab => {},
+                            _ => evt.prevent_default(),
+                        }
+                    },
+                    onblur: move |_| {
+                        scaleValue.set(String::from("1"));
+                    }
                 }
                 div {
                     class: "button",
