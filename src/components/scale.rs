@@ -44,7 +44,6 @@ pub fn Scale(max: u32, min: u32, title: String, scaleValue: Signal<String>) -> E
                         }
                     },
                     onkeydown: move |evt| {
-                        // console::log_1(evt.into());
                         match &evt.key() {
                             Key::Character(c) if c.chars().all(|ch| ch.is_numeric()) => {},
                             Key::Backspace | Key::Delete | Key::ArrowLeft | Key::ArrowRight | Key::Tab => {},
@@ -52,7 +51,9 @@ pub fn Scale(max: u32, min: u32, title: String, scaleValue: Signal<String>) -> E
                         }
                     },
                     onblur: move |_| {
-                        scaleValue.set(String::from("1"));
+                        if scaleValue() == "".to_string(){
+                            scaleValue.set(String::from("1"));
+                        }
                     }
                 }
                 div {

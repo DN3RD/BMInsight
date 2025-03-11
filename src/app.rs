@@ -99,7 +99,6 @@ pub fn App() -> Element {
                         min: 1,
                         title: "Weight (in Lb)",
                         scaleValue: weightSignal,
-
                     }
                     Scale {
                         max: 100,
