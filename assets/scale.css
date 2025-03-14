@@ -1,0 +1,50 @@
+.scale-wrapper {
+  border: 1px solid #999;
+  border-radius: 18px;
+  padding: 24px;
+  gap: 24px;
+}
+.scale-wrapper>h4{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.scale {
+  gap: 24px;
+  justify-content: space-between;
+  min-width: 0;
+  flex:1;
+  align-items: center;
+}
+.scale .input-value {
+  color: dodgerblue;
+  background: transparent;
+  border: none;
+  outline: none;
+  display: inline;
+  width: 100px;
+  text-align: center;
+  font-size: 28px;
+  font-scale: 700;
+}
+.scale .button {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #999;
+}
+.scale .button:hover {
+  background-color: rgba(30, 144, 255, 0.1);
+}
+
+.scale .input-value[type="number"]::-webkit-inner-spin-button,
+.scale .input-value[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* For Firefox */
+.scale .input-value[type="number"] {
+  -moz-appearance: textfield;
+}

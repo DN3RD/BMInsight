@@ -9,9 +9,8 @@ dioxus = { version = "0.6", features = ["web"] }
 dioxus-logger = "0.6"
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
-web-sys = "0.3"
-js-sys = "0.3"
-serde = { version = "1", features = ["derive"] }
+web-sys = { version = "0.3", features = ["ScrollToOptions"] }
+serde = { version = "1.0.218", features = ["derive"] }
 serde-wasm-bindgen = "0.6"
 
 [workspace]

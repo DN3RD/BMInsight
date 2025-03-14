@@ -7,15 +7,16 @@
     "beforeDevCommand": "dx serve --port 1420",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "dx build --release",
-    "frontendDist": "../dist"
+    "frontendDist": "../target/dx/bminsight-ui/release/web/public"
   },
   "app": {
     "withGlobalTauri": true,
     "windows": [
       {
         "title": "bminsight",
-        "width": 800,
-        "height": 600
+        "width": 430,
+        "height": 932,
+        "resizable": true
       }
     ],
     "security": {
@@ -31,6 +32,9 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "resources": [
+      "../.env"
     ]
   }
 }

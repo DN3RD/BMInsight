@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 
+use crate::components::{Gender, Ruler, Scale};
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -11,68 +12,148 @@ extern "C" {
 }
 
 #[derive(Serialize, Deserialize)]
-struct GreetArgs<'a> {
-    name: &'a str,
+struct BmiArgs {
+    age: u8,
+    gender: String,
+    #[serde(rename = "heightInches")]
+    height_inches: u16,
+    #[serde(rename = "weightPounds")]
+    weight_pounds: u16,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct BmiFeedback {
+    pub interpretation: String,
+    pub suggestions: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+struct BmiResult {
+    bmi_value: f64,
+    category: String,
+    feedback: BmiFeedback,
+}
+
+impl std::fmt::Display for BmiResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "BMI: {:.1}, Category: {}, Feedback: {:?}",
+            self.bmi_value, self.category, self.feedback
+        )
+    }
 }
 
 pub fn App() -> Element {
-    let mut name = use_signal(|| String::new());
-    let mut greet_msg = use_signal(|| String::new());
+    let weightSignal = use_signal(|| "1".to_string());
+    let ageSignal = use_signal(|| "1".to_string());
+    let genderSignal = use_signal(move || "male".to_string());
+    let heightSignal = use_signal(|| 48u16);
 
+    let mut hiddenSignal = use_signal(move || true);
 
-    let greet = move |_: FormEvent| async move {
-        if name.read().is_empty() {
-            return;
-        }
+    let mut bmi_result = use_signal(|| BmiResult {
+        bmi_value: 0.0,
+        category: String::new(),
+        feedback: BmiFeedback {
+            interpretation: String::new(),
+            suggestions: vec![],
+        },
+    });
 
-        let name = name.read();
-        let args = serde_wasm_bindgen::to_value(&GreetArgs { name: &*name }).unwrap();
-        // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-        let new_msg = invoke("greet", args).await.as_string().unwrap();
-        greet_msg.set(new_msg);
+    let getBmi = move |_: MouseEvent| async move {
+        let bmi_args = serde_wasm_bindgen::to_value(&BmiArgs {
+            age: ageSignal().parse().unwrap(),
+            gender: genderSignal(),
+            height_inches: heightSignal(),
+            weight_pounds: weightSignal().parse().unwrap(),
+        })
+        .unwrap();
+
+        let bmi = invoke("compute_bmi", bmi_args).await;
+        bmi_result.set(serde_wasm_bindgen::from_value(bmi).unwrap());
+        hiddenSignal.set(false)
     };
-
+    let bmi = bmi_result().clone();
     rsx! {
         link { rel: "stylesheet", href: "assets/styles.css" }
+        link { rel: "stylesheet", href:"https://fonts.googleapis.com/icon?family=Material+Icons" }
         main {
-            class: "container",
-            h1 { "Welcome to Tauri + Dioxus" }
-
+            class: "main",
             div {
-                class: "row",
-                a {
-                    href: "https://tauri.app",
-                    target: "_blank",
-                    img {
-                        src: "assets/tauri.svg",
-                        class: "logo tauri",
-                         alt: "Tauri logo"
+                class: "container",
+                div {
+                    class: "column form-container",
+                    h2 {
+                        class: "title",
+                        "BMI Insight"
                     }
-                }
-                a {
-                    href: "https://dioxuslabs.com/",
-                    target: "_blank",
-                    img {
-                        src: "assets/dioxus.png",
-                        class: "logo dioxus",
-                        alt: "Dioxus logo"
+                    Gender {
+                        gender: genderSignal
+                    }
+                    Ruler {
+                        height: heightSignal,
+                    }
+                    Scale {
+                        max: 1000,
+                        min: 1,
+                        title: "Weight (in Lb)",
+                        scaleValue: weightSignal,
+                    }
+                    Scale {
+                        max: 100,
+                        min: 1,
+                        title: "Age",
+                        scaleValue: ageSignal,
                     }
                 }
             }
-            p { "Click on the Tauri and Dioxus logos to learn more." }
+            div {
+                class: format!("result-container-wrapper {}", if hiddenSignal() {""} else {"full-page"}),
+                onclick: move |_| {
+                    hiddenSignal.set(true);
+                },
+                div {
+                    class: "result-container",
+                    div {
+                        class: "circle",
+                        onclick: getBmi,
+                        "BMI"
+                    }
+                    div {
+                        class: format!("result-wrapper {}", if hiddenSignal() {"hidden"} else {""}),
+                        p {
+                            class: "result-header",
+                            "Your BMI is"
+                        }
+                        p {
+                            class: "result-value",
+                            "{bmi.bmi_value} Kg/m"
+                            sup { "2" }
+                        }
+                        p {
+                            class: "result-category",
+                            "{bmi_result().category}"
+                        }
 
-            form {
-                class: "row",
-                onsubmit: greet,
-                input {
-                    id: "greet-input",
-                    placeholder: "Enter a name...",
-                    value: "{name}",
-                    oninput: move |event| name.set(event.value())
+                        p {
+                             class: "interpretation-text",
+                            "{bmi_result().feedback.interpretation}"
+                        }
+                        
+                        ul {
+                            class: "list",
+                            for suggestion in &bmi_result().feedback.suggestions {
+                                li {
+                                    class: "list-item",
+                                    "{suggestion}"
+                                }
+                            }
+                        }
+
+                    }
                 }
-                button { r#type: "submit", "Greet" }
             }
-            p { "{greet_msg}" }
         }
     }
 }
